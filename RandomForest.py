@@ -18,12 +18,20 @@ train_no_index = training_data.drop("rowIndex", axis=1, inplace=False)
 train_no_index.drop("ClaimAmount", axis=1, inplace=True)
 train_x = Normalizer().fit_transform(train_no_index)
 
-trees_count = [10, 30, 100, 200]
+test_x = test_data.drop("rowIndex", axis=1, inplace=False)
+test_x = Normalizer().fit_transform(test_x)
 
-for tree_count in trees_count:
-    model = RandomForestRegressor(n_estimators=tree_count, random_state=0)
-    model.fit(train_x, train_y)
-    train_y_pred = model.predict(train_x)
-    cur_mae = metrics.mean_absolute_error(train_y, train_y_pred)
-    print("For tree_count = " + str(tree_count) + ", MAE: " + str(cur_mae))
 
+
+model = RandomForestRegressor(n_estimators=50, random_state=0)
+model.fit(train_x, train_y)
+train_y_pred = model.predict(train_x)
+cur_mae = metrics.mean_absolute_error(train_y, train_y_pred)
+print("For tree_count = " + str(50) + ", training MAE: " + str(cur_mae))
+
+pred_y = model.predict(test_x)
+output = pd.DataFrame({})
+output['rowIndex'] = range(len(pred_y))
+output['claimAmount'] = pred_y
+
+output.to_csv("./submissions/submission_RandomForest.csv", header=True, index=False)
