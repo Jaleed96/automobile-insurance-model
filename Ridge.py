@@ -12,15 +12,15 @@ test_data = pd.read_csv("./datasets/testset.csv")
 
 # Splitting into x-y
 train_y = training_data["ClaimAmount"]
-train_no_index = training_data.drop("rowIndex", axis=1, inplace=False)
-train_no_index.drop("ClaimAmount", axis=1, inplace=True)
+train_x = training_data.drop("rowIndex", axis=1, inplace=False)
+train_x.drop("ClaimAmount", axis=1, inplace=True)
 
 # One hot-encoding
-categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
-train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
+# categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
+# train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 test_x = test_data.drop("rowIndex", axis=1, inplace=False)
-test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
+# test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 ridge_train_errors = []
 ridge_cv_errors = []

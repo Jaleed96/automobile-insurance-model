@@ -12,14 +12,14 @@ test_data = pd.read_csv("./datasets/testset.csv")
 
 # Splitting into x-y
 train_y = training_data["ClaimAmount"]
-train_no_index = training_data.drop("rowIndex", axis=1, inplace=False)
-train_no_index.drop("ClaimAmount", axis=1, inplace=True)
+train_x = training_data.drop("rowIndex", axis=1, inplace=False)
+train_x.drop("ClaimAmount", axis=1, inplace=True)
 
-categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
-train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
+# categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
+# train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 test_x = test_data.drop("rowIndex", axis=1, inplace=False)
-test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
+# test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 lasso_train_errors = []
 lasso_cv_errors = []
@@ -43,7 +43,7 @@ plt.title("5-Fold errors by Lambda value (Lasso)")
 plt.legend()
 plt.show()
 
-lasso = Lasso(alpha=math.pow(10, 0.75))
+lasso = Lasso(alpha=math.pow(10, 0.5))
 lasso.fit(train_x, train_y)
 
 predicted_train_y = lasso.predict(train_x)
