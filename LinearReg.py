@@ -56,6 +56,30 @@ train_indices = shuffled_indices[:train_set_size]
 # test set: take the remaining rows
 test_indices = shuffled_indices[train_set_size:]
 
+data_subset = data.loc[:, ['feature1','feature2','feature4','feature6','feature7','feature10','feature11','feature16','feature18', 'ClaimAmount']]
+train_data = data_subset.iloc[train_indices, :]
+test_data = data_subset.iloc[test_indices, :]
+train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+train_labels = train_data.loc[:, 'ClaimAmount']
+test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+test_labels = test_data.loc[:, 'ClaimAmount']
+w = comp4983_lin_reg_fit(train_features, train_labels)
+pred_y = comp4983_lin_reg_predict(test_features, w)
+mae = np.mean(abs(test_labels - pred_y))
+rmse = np.sqrt(np.mean(pow(test_labels - pred_y, 2)))
+total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+res_sum_sq = sum(pow(test_labels - pred_y, 2))
+CoD = 1 - (res_sum_sq/total_sum_sq)
+print('Mean Absolute Error = ', mae)
+print('Root Mean Squared Error = ', rmse)
+print('Coefficient of Determination = ', CoD)
+
+output = pd.DataFrame({})
+output['rowIndex'] = range(len(pred_y))
+output['claimAmount'] = pred_y
+
+output.to_csv("./submissions/submission_LinearReg.csv", header=True, index=False)
+
 # best_mae = float('inf')
 
 # for i in range(data.shape[1] - 1) :
@@ -435,287 +459,287 @@ test_indices = shuffled_indices[train_set_size:]
 #                                     dropped_feature_7 = o
 #                                     dropped_feature_8 = p
 
-# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.columns[dropped_feature_7], data.columns[dropped_feature_8], data.shape[1] - 1]], axis=1)
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.columns[dropped_feature_7], data.columns[dropped_feature_8], data.columns[data.shape[1] - 1]], axis=1)
 # print('Best 10 features: ', best_features.columns)
 # print('Mean Absolute Error = ', best_mae)
 # print('Root Mean Squared Error = ', best_rmse)
 # print('Coefficient of Determination = ', best_CoD)
 # print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        for k in range(j + 1, data.shape[1] - 1) :
-            for l in range(k + 1, data.shape[1] - 1) :
-                for m in range(l + 1, data.shape[1] - 1) :
-                    for n in range(m + 1, data.shape[1] - 1) :
-                        for o in range(n + 1, data.shape[1] - 1) :
-                            data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m], data.columns[n], data.columns[o]], axis=1)
-                            train_data = data_subset.iloc[train_indices, :]
-                            test_data = data_subset.iloc[test_indices, :]
-                            train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                            train_labels = train_data.loc[:, 'ClaimAmount']
-                            test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                            test_labels = test_data.loc[:, 'ClaimAmount']
-                            w = comp4983_lin_reg_fit(train_features, train_labels)
-                            price_pred = comp4983_lin_reg_predict(test_features, w)
-                            mae = np.mean(abs(test_labels - price_pred))
-                            rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-                            total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-                            res_sum_sq = sum(pow(test_labels - price_pred, 2))
-                            CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         for k in range(j + 1, data.shape[1] - 1) :
+#             for l in range(k + 1, data.shape[1] - 1) :
+#                 for m in range(l + 1, data.shape[1] - 1) :
+#                     for n in range(m + 1, data.shape[1] - 1) :
+#                         for o in range(n + 1, data.shape[1] - 1) :
+#                             data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m], data.columns[n], data.columns[o]], axis=1)
+#                             train_data = data_subset.iloc[train_indices, :]
+#                             test_data = data_subset.iloc[test_indices, :]
+#                             train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                             train_labels = train_data.loc[:, 'ClaimAmount']
+#                             test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                             test_labels = test_data.loc[:, 'ClaimAmount']
+#                             w = comp4983_lin_reg_fit(train_features, train_labels)
+#                             price_pred = comp4983_lin_reg_predict(test_features, w)
+#                             mae = np.mean(abs(test_labels - price_pred))
+#                             rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#                             total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#                             res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#                             CoD = 1 - (res_sum_sq/total_sum_sq)
 
-                            if mae < best_mae :
-                                best_mae = mae
-                                best_rmse = rmse
-                                best_CoD = CoD
-                                dropped_feature_1 = i
-                                dropped_feature_2 = j
-                                dropped_feature_3 = k
-                                dropped_feature_4 = l
-                                dropped_feature_5 = m
-                                dropped_feature_6 = n
-                                dropped_feature_7 = o
+#                             if mae < best_mae :
+#                                 best_mae = mae
+#                                 best_rmse = rmse
+#                                 best_CoD = CoD
+#                                 dropped_feature_1 = i
+#                                 dropped_feature_2 = j
+#                                 dropped_feature_3 = k
+#                                 dropped_feature_4 = l
+#                                 dropped_feature_5 = m
+#                                 dropped_feature_6 = n
+#                                 dropped_feature_7 = o
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.columns[dropped_feature_7], data.shape[1] - 1], axis=1)
-print('Best 11 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.columns[dropped_feature_7], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 11 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        for k in range(j + 1, data.shape[1] - 1) :
-            for l in range(k + 1, data.shape[1] - 1) :
-                for m in range(l + 1, data.shape[1] - 1) :
-                    for n in range(m + 1, data.shape[1] - 1) :
-                        data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m], data.columns[n]], axis=1)
-                        train_data = data_subset.iloc[train_indices, :]
-                        test_data = data_subset.iloc[test_indices, :]
-                        train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                        train_labels = train_data.loc[:, 'ClaimAmount']
-                        test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                        test_labels = test_data.loc[:, 'ClaimAmount']
-                        w = comp4983_lin_reg_fit(train_features, train_labels)
-                        price_pred = comp4983_lin_reg_predict(test_features, w)
-                        mae = np.mean(abs(test_labels - price_pred))
-                        rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-                        total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-                        res_sum_sq = sum(pow(test_labels - price_pred, 2))
-                        CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         for k in range(j + 1, data.shape[1] - 1) :
+#             for l in range(k + 1, data.shape[1] - 1) :
+#                 for m in range(l + 1, data.shape[1] - 1) :
+#                     for n in range(m + 1, data.shape[1] - 1) :
+#                         data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m], data.columns[n]], axis=1)
+#                         train_data = data_subset.iloc[train_indices, :]
+#                         test_data = data_subset.iloc[test_indices, :]
+#                         train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                         train_labels = train_data.loc[:, 'ClaimAmount']
+#                         test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                         test_labels = test_data.loc[:, 'ClaimAmount']
+#                         w = comp4983_lin_reg_fit(train_features, train_labels)
+#                         price_pred = comp4983_lin_reg_predict(test_features, w)
+#                         mae = np.mean(abs(test_labels - price_pred))
+#                         rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#                         total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#                         res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#                         CoD = 1 - (res_sum_sq/total_sum_sq)
 
-                        if mae < best_mae :
-                            best_mae = mae
-                            best_rmse = rmse
-                            best_CoD = CoD
-                            dropped_feature_1 = i
-                            dropped_feature_2 = j
-                            dropped_feature_3 = k
-                            dropped_feature_4 = l
-                            dropped_feature_5 = m
-                            dropped_feature_6 = n
+#                         if mae < best_mae :
+#                             best_mae = mae
+#                             best_rmse = rmse
+#                             best_CoD = CoD
+#                             dropped_feature_1 = i
+#                             dropped_feature_2 = j
+#                             dropped_feature_3 = k
+#                             dropped_feature_4 = l
+#                             dropped_feature_5 = m
+#                             dropped_feature_6 = n
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.shape[1] - 1], axis=1)
-print('Best 12 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[dropped_feature_6], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 12 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        for k in range(j + 1, data.shape[1] - 1) :
-            for l in range(k + 1, data.shape[1] - 1) :
-                for m in range(l + 1, data.shape[1] - 1) :
-                    data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m]], axis=1)
-                    train_data = data_subset.iloc[train_indices, :]
-                    test_data = data_subset.iloc[test_indices, :]
-                    train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                    train_labels = train_data.loc[:, 'ClaimAmount']
-                    test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                    test_labels = test_data.loc[:, 'ClaimAmount']
-                    w = comp4983_lin_reg_fit(train_features, train_labels)
-                    price_pred = comp4983_lin_reg_predict(test_features, w)
-                    mae = np.mean(abs(test_labels - price_pred))
-                    rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-                    total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-                    res_sum_sq = sum(pow(test_labels - price_pred, 2))
-                    CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         for k in range(j + 1, data.shape[1] - 1) :
+#             for l in range(k + 1, data.shape[1] - 1) :
+#                 for m in range(l + 1, data.shape[1] - 1) :
+#                     data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l], data.columns[m]], axis=1)
+#                     train_data = data_subset.iloc[train_indices, :]
+#                     test_data = data_subset.iloc[test_indices, :]
+#                     train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                     train_labels = train_data.loc[:, 'ClaimAmount']
+#                     test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                     test_labels = test_data.loc[:, 'ClaimAmount']
+#                     w = comp4983_lin_reg_fit(train_features, train_labels)
+#                     price_pred = comp4983_lin_reg_predict(test_features, w)
+#                     mae = np.mean(abs(test_labels - price_pred))
+#                     rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#                     total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#                     res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#                     CoD = 1 - (res_sum_sq/total_sum_sq)
 
-                    if mae < best_mae :
-                        best_mae = mae
-                        best_rmse = rmse
-                        best_CoD = CoD
-                        dropped_feature_1 = i
-                        dropped_feature_2 = j
-                        dropped_feature_3 = k
-                        dropped_feature_4 = l
-                        dropped_feature_5 = m
+#                     if mae < best_mae :
+#                         best_mae = mae
+#                         best_rmse = rmse
+#                         best_CoD = CoD
+#                         dropped_feature_1 = i
+#                         dropped_feature_2 = j
+#                         dropped_feature_3 = k
+#                         dropped_feature_4 = l
+#                         dropped_feature_5 = m
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.shape[1] - 1], axis=1)
-print('Best 13 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[dropped_feature_5], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 13 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        for k in range(j + 1, data.shape[1] - 1) :
-            for l in range(k + 1, data.shape[1] - 1) :
-                data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l]], axis=1)
-                train_data = data_subset.iloc[train_indices, :]
-                test_data = data_subset.iloc[test_indices, :]
-                train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                train_labels = train_data.loc[:, 'ClaimAmount']
-                test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-                test_labels = test_data.loc[:, 'ClaimAmount']
-                w = comp4983_lin_reg_fit(train_features, train_labels)
-                price_pred = comp4983_lin_reg_predict(test_features, w)
-                mae = np.mean(abs(test_labels - price_pred))
-                rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-                total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-                res_sum_sq = sum(pow(test_labels - price_pred, 2))
-                CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         for k in range(j + 1, data.shape[1] - 1) :
+#             for l in range(k + 1, data.shape[1] - 1) :
+#                 data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k], data.columns[l]], axis=1)
+#                 train_data = data_subset.iloc[train_indices, :]
+#                 test_data = data_subset.iloc[test_indices, :]
+#                 train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                 train_labels = train_data.loc[:, 'ClaimAmount']
+#                 test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#                 test_labels = test_data.loc[:, 'ClaimAmount']
+#                 w = comp4983_lin_reg_fit(train_features, train_labels)
+#                 price_pred = comp4983_lin_reg_predict(test_features, w)
+#                 mae = np.mean(abs(test_labels - price_pred))
+#                 rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#                 total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#                 res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#                 CoD = 1 - (res_sum_sq/total_sum_sq)
 
-                if mae < best_mae :
-                    best_mae = mae
-                    best_rmse = rmse
-                    best_CoD = CoD
-                    dropped_feature_1 = i
-                    dropped_feature_2 = j
-                    dropped_feature_3 = k
-                    dropped_feature_4 = l
+#                 if mae < best_mae :
+#                     best_mae = mae
+#                     best_rmse = rmse
+#                     best_CoD = CoD
+#                     dropped_feature_1 = i
+#                     dropped_feature_2 = j
+#                     dropped_feature_3 = k
+#                     dropped_feature_4 = l
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.shape[1] - 1], axis=1)
-print('Best 14 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[dropped_feature_4], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 14 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        for k in range(j + 1, data.shape[1] - 1) :
-            data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k]], axis=1)
-            train_data = data_subset.iloc[train_indices, :]
-            test_data = data_subset.iloc[test_indices, :]
-            train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-            train_labels = train_data.loc[:, 'ClaimAmount']
-            test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-            test_labels = test_data.loc[:, 'ClaimAmount']
-            w = comp4983_lin_reg_fit(train_features, train_labels)
-            price_pred = comp4983_lin_reg_predict(test_features, w)
-            mae = np.mean(abs(test_labels - price_pred))
-            rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-            total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-            res_sum_sq = sum(pow(test_labels - price_pred, 2))
-            CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         for k in range(j + 1, data.shape[1] - 1) :
+#             data_subset = data.drop([data.columns[i], data.columns[j], data.columns[k]], axis=1)
+#             train_data = data_subset.iloc[train_indices, :]
+#             test_data = data_subset.iloc[test_indices, :]
+#             train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#             train_labels = train_data.loc[:, 'ClaimAmount']
+#             test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#             test_labels = test_data.loc[:, 'ClaimAmount']
+#             w = comp4983_lin_reg_fit(train_features, train_labels)
+#             price_pred = comp4983_lin_reg_predict(test_features, w)
+#             mae = np.mean(abs(test_labels - price_pred))
+#             rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#             total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#             res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#             CoD = 1 - (res_sum_sq/total_sum_sq)
 
-            if mae < best_mae :
-                best_mae = mae
-                best_rmse = rmse
-                best_CoD = CoD
-                dropped_feature_1 = i
-                dropped_feature_2 = j
-                dropped_feature_3 = k
+#             if mae < best_mae :
+#                 best_mae = mae
+#                 best_rmse = rmse
+#                 best_CoD = CoD
+#                 dropped_feature_1 = i
+#                 dropped_feature_2 = j
+#                 dropped_feature_3 = k
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.shape[1] - 1], axis=1)
-print('Best 15 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[dropped_feature_3], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 15 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    for j in range(i + 1, data.shape[1] - 1) :
-        data_subset = data.drop([data.columns[i], data.columns[j]], axis=1)
-        train_data = data_subset.iloc[train_indices, :]
-        test_data = data_subset.iloc[test_indices, :]
-        train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-        train_labels = train_data.loc[:, 'ClaimAmount']
-        test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-        test_labels = test_data.loc[:, 'ClaimAmount']
-        w = comp4983_lin_reg_fit(train_features, train_labels)
-        price_pred = comp4983_lin_reg_predict(test_features, w)
-        mae = np.mean(abs(test_labels - price_pred))
-        rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-        total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-        res_sum_sq = sum(pow(test_labels - price_pred, 2))
-        CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     for j in range(i + 1, data.shape[1] - 1) :
+#         data_subset = data.drop([data.columns[i], data.columns[j]], axis=1)
+#         train_data = data_subset.iloc[train_indices, :]
+#         test_data = data_subset.iloc[test_indices, :]
+#         train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#         train_labels = train_data.loc[:, 'ClaimAmount']
+#         test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#         test_labels = test_data.loc[:, 'ClaimAmount']
+#         w = comp4983_lin_reg_fit(train_features, train_labels)
+#         price_pred = comp4983_lin_reg_predict(test_features, w)
+#         mae = np.mean(abs(test_labels - price_pred))
+#         rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#         total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#         res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#         CoD = 1 - (res_sum_sq/total_sum_sq)
 
-        if mae < best_mae :
-            best_mae = mae
-            best_rmse = rmse
-            best_CoD = CoD
-            dropped_feature_1 = i
-            dropped_feature_2 = j
+#         if mae < best_mae :
+#             best_mae = mae
+#             best_rmse = rmse
+#             best_CoD = CoD
+#             dropped_feature_1 = i
+#             dropped_feature_2 = j
 
-best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.shape[1] - 1], axis=1)
-print('Best 16 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[dropped_feature_2], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 16 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-best_mae = float('inf')
+# best_mae = float('inf')
 
-for i in range(data.shape[1] - 1) :
-    data_subset = data.drop([data.columns[i]], axis=1)
-    train_data = data_subset.iloc[train_indices, :]
-    test_data = data_subset.iloc[test_indices, :]
-    train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-    train_labels = train_data.loc[:, 'ClaimAmount']
-    test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-    test_labels = test_data.loc[:, 'ClaimAmount']
-    w = comp4983_lin_reg_fit(train_features, train_labels)
-    price_pred = comp4983_lin_reg_predict(test_features, w)
-    mae = np.mean(abs(test_labels - price_pred))
-    rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-    total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-    res_sum_sq = sum(pow(test_labels - price_pred, 2))
-    CoD = 1 - (res_sum_sq/total_sum_sq)
+# for i in range(data.shape[1] - 1) :
+#     data_subset = data.drop([data.columns[i]], axis=1)
+#     train_data = data_subset.iloc[train_indices, :]
+#     test_data = data_subset.iloc[test_indices, :]
+#     train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#     train_labels = train_data.loc[:, 'ClaimAmount']
+#     test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+#     test_labels = test_data.loc[:, 'ClaimAmount']
+#     w = comp4983_lin_reg_fit(train_features, train_labels)
+#     price_pred = comp4983_lin_reg_predict(test_features, w)
+#     mae = np.mean(abs(test_labels - price_pred))
+#     rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+#     total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+#     res_sum_sq = sum(pow(test_labels - price_pred, 2))
+#     CoD = 1 - (res_sum_sq/total_sum_sq)
 
-    if mae < best_mae :
-        best_mae = mae
-        best_rmse = rmse
-        best_CoD = CoD
-        dropped_feature_1 = i
+#     if mae < best_mae :
+#         best_mae = mae
+#         best_rmse = rmse
+#         best_CoD = CoD
+#         dropped_feature_1 = i
 
-best_features = data.drop([data.columns[dropped_feature_1], data.shape[1] - 1], axis=1)
-print('Best 17 features: ', best_features.columns)
-print('Mean Absolute Error = ', best_mae)
-print('Root Mean Squared Error = ', best_rmse)
-print('Coefficient of Determination = ', best_CoD)
-print('_')
+# best_features = data.drop([data.columns[dropped_feature_1], data.columns[data.shape[1] - 1]], axis=1)
+# print('Best 17 features: ', best_features.columns)
+# print('Mean Absolute Error = ', best_mae)
+# print('Root Mean Squared Error = ', best_rmse)
+# print('Coefficient of Determination = ', best_CoD)
+# print('_')
 
-train_data = data.iloc[train_indices, :]
-test_data = data.iloc[test_indices, :]
-train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-train_labels = train_data.loc[:, 'ClaimAmount']
-test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-test_labels = test_data.loc[:, 'ClaimAmount']
-w = comp4983_lin_reg_fit(train_features, train_labels)
-price_pred = comp4983_lin_reg_predict(test_features, w)
-mae = np.mean(abs(test_labels - price_pred))
-rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
-total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-res_sum_sq = sum(pow(test_labels - price_pred, 2))
-CoD = 1 - (res_sum_sq/total_sum_sq)
+# train_data = data.iloc[train_indices, :]
+# test_data = data.iloc[test_indices, :]
+# train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
+# train_labels = train_data.loc[:, 'ClaimAmount']
+# test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
+# test_labels = test_data.loc[:, 'ClaimAmount']
+# w = comp4983_lin_reg_fit(train_features, train_labels)
+# price_pred = comp4983_lin_reg_predict(test_features, w)
+# mae = np.mean(abs(test_labels - price_pred))
+# rmse = np.sqrt(np.mean(pow(test_labels - price_pred, 2)))
+# total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
+# res_sum_sq = sum(pow(test_labels - price_pred, 2))
+# CoD = 1 - (res_sum_sq/total_sum_sq)
 
-print('All features')
-print('Mean Absolute Error = ', mae)
-print('Root Mean Squared Error = ', rmse)
-print('Coefficient of Determination = ', CoD)
+# print('All features')
+# print('Mean Absolute Error = ', mae)
+# print('Root Mean Squared Error = ', rmse)
+# print('Coefficient of Determination = ', CoD)
