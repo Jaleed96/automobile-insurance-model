@@ -14,10 +14,12 @@ test_data = pd.read_csv("./datasets/testset.csv")
 train_y = training_data["ClaimAmount"]
 train_no_index = training_data.drop("rowIndex", axis=1, inplace=False)
 train_no_index.drop("ClaimAmount", axis=1, inplace=True)
-train_x = Normalizer().fit_transform(train_no_index)
+
+categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
+train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 test_x = test_data.drop("rowIndex", axis=1, inplace=False)
-test_x = Normalizer().fit_transform(test_x)
+test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
 lasso_train_errors = []
 lasso_cv_errors = []
@@ -41,12 +43,13 @@ plt.title("5-Fold errors by Lambda value (Lasso)")
 plt.legend()
 plt.show()
 
-lasso = Lasso(alpha=math.pow(10, -2))
+lasso = Lasso(alpha=math.pow(10, 0.75))
 lasso.fit(train_x, train_y)
 
 predicted_train_y = lasso.predict(train_x)
 
 lasso_train_mae = np.mean(abs(train_y - predicted_train_y))
+print("Validation MAE: " + str(lasso_cv_errors[18]))
 print("Training MAE: " + str(lasso_train_mae))
 
 pred_y = lasso.predict(test_x)
