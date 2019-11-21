@@ -32,47 +32,26 @@ def comp4983_lin_reg_predict(X, w):
     y = np.dot(X, w)
     return y
 
-data = pd.read_csv("./datasets/trainingset.csv")
-data = data.iloc[:, 1:]
-print('\n\ndata.info():')
-print(data.info())
+training_data = pd.read_csv("./datasets/trainingset.csv")
+test_data = pd.read_csv("./datasets/testset.csv")
 
-# split the data into training set and test set
-# use 75 percent of the data to train the model and hold back 25 percent
-# for testing
-train_ratio = 0.75
-# number of samples in the data_subset
-num_rows = data.shape[0]
-# shuffle the indices
-shuffled_indices = list(range(num_rows))
-random.seed(42)
-random.shuffle(shuffled_indices)
+# Splitting into x-y
+train_y = training_data["ClaimAmount"]
 
-# calculate the number of rows for training 
-train_set_size = int(num_rows * train_ratio)
+train_no_index = training_data.drop("rowIndex", axis=1, inplace=False)
+train_no_index.drop("ClaimAmount", axis=1, inplace=True)
 
-# training set: take the first 'train_set_size' rows
-train_indices = shuffled_indices[:train_set_size]
-# test set: take the remaining rows
-test_indices = shuffled_indices[train_set_size:]
+test_x = test_data.drop("rowIndex", axis=1, inplace=False)
 
-data_subset = data.loc[:, ['feature1','feature2','feature4','feature6','feature7','feature10','feature11','feature16','feature18', 'ClaimAmount']]
-train_data = data_subset.iloc[train_indices, :]
-test_data = data_subset.iloc[test_indices, :]
-train_features = train_data.drop(['ClaimAmount'], axis=1, inplace=False)
-train_labels = train_data.loc[:, 'ClaimAmount']
-test_features = test_data.drop(['ClaimAmount'], axis=1, inplace=False)
-test_labels = test_data.loc[:, 'ClaimAmount']
-w = comp4983_lin_reg_fit(train_features, train_labels)
-pred_y = comp4983_lin_reg_predict(test_features, w)
-mae = np.mean(abs(test_labels - pred_y))
-rmse = np.sqrt(np.mean(pow(test_labels - pred_y, 2)))
-total_sum_sq = sum(pow(test_labels - np.mean(test_labels), 2))
-res_sum_sq = sum(pow(test_labels - pred_y, 2))
-CoD = 1 - (res_sum_sq/total_sum_sq)
+train_x = train_no_index.loc[:, ['feature1','feature2','feature4','feature6','feature7','feature10','feature11','feature16','feature18']]
+test_x = test_x.loc[:, ['feature1','feature2','feature4','feature6','feature7','feature10','feature11','feature16','feature18']]
+lin_reg = LinearRegression()
+lin_reg.fit(train_x, train_y)
+pred_train_y = lin_reg.predict(train_x)
+mae = np.mean(abs(train_y - pred_train_y))
 print('Mean Absolute Error = ', mae)
-print('Root Mean Squared Error = ', rmse)
-print('Coefficient of Determination = ', CoD)
+
+pred_y = lin_reg.predict(test_x)
 
 output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y))
