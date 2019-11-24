@@ -2,10 +2,9 @@ import pandas as pd
 import numpy as np
 import random
 import math
-from sklearn.linear_model import Lasso
-from sklearn.preprocessing import Normalizer
+from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_validate
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
@@ -23,37 +22,40 @@ train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=c
 test_x = test_data.drop("rowIndex", axis=1, inplace=False)
 test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
 
+train_y_categorical = train_y.astype('bool')
+train_y_categorical = train_y_categorical.astype('int')
+
+
 rf_train_errors = []
 rf_cv_errors = []
 
-for i in np.arange(5, 31):
-    model = RandomForestRegressor(n_estimators=12, random_state=0, max_features=25, n_jobs=-1, max_depth=31, min_samples_leaf=i)
 
-    result = cross_validate(model, train_x, train_y, cv=5, scoring='neg_mean_absolute_error', return_train_score=True)
+for i in range(2, 3):
+    model = RandomForestClassifier(n_estimators=11, random_state=0, max_features=13, n_jobs=-1, max_depth=14, min_samples_leaf=5)
+    result = cross_validate(model, train_x, train_y_categorical, cv=6, scoring='precision', return_train_score=True)
     train_score = result['train_score']
     test_score = result['test_score']
 
     rf_train_errors.append(abs(np.sum(train_score) / 5))
     rf_cv_errors.append(abs(np.sum(test_score) / 5))
 
-plt.plot(np.arange(5, 31), rf_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(5, 31), rf_cv_errors, color="red", label="Validation errors")
+print("Training error for trees = 30: " + str(rf_train_errors))
+print("Validation error for trees = 30: " + str(rf_cv_errors))
+
+plt.plot(np.arange(2, 3), rf_train_errors, color="green", label="Training errors")
+plt.plot(np.arange(2, 3), rf_cv_errors, color="red", label="Validation errors")
 plt.xlabel("Lambda values")
 plt.ylabel("MAE")
 plt.title("5-Fold errors by Lambda value (Random Forest)")
 plt.legend()
 plt.show()
 
+# model = RandomForestRegressor(n_estimators=30, random_state=0)
+# model.fit(train_x, train_y_categorical)
 
-print("Training error for trees = 30: " + str(rf_train_errors[25]))
-print("Validation error for trees = 30: " + str(rf_cv_errors[25]))
+# pred_y = model.predict(test_x)
+# output = pd.DataFrame({})
+# output['rowIndex'] = range(len(pred_y))
+# output['claimAmount'] = pred_y
 
-model = RandomForestRegressor(n_estimators=12, random_state=0, max_features=25, n_jobs=-1, max_depth=31, min_samples_leaf=30)
-model.fit(train_x, train_y)
-
-pred_y = model.predict(test_x)
-output = pd.DataFrame({})
-output['rowIndex'] = range(len(pred_y))
-output['claimAmount'] = pred_y
-
-output.to_csv("./submissions/1_2_5.csv", header=True, index=False)
+# output.to_csv("./submissions/submission_RandomForest_Regression.csv", header=True, index=False)

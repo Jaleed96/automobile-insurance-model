@@ -57,4 +57,4 @@ output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y))
 output['claimAmount'] = pred_y
 
-output.to_csv("./submissions/submission_Lasso.csv", header=True, index=False)
+output.to_csv("./submissions/1_2_2.csv", header=True, index=False)
