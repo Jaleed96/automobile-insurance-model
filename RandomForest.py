@@ -26,7 +26,7 @@ test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorica
 rf_train_errors = []
 rf_cv_errors = []
 
-for i in np.arange(5, 31):
+for i in np.arange(30, 31):
     model = RandomForestRegressor(n_estimators=12, random_state=0, max_features=25, n_jobs=-1, max_depth=31, min_samples_leaf=i)
 
     result = cross_validate(model, train_x, train_y, cv=5, scoring='neg_mean_absolute_error', return_train_score=True)
@@ -36,8 +36,8 @@ for i in np.arange(5, 31):
     rf_train_errors.append(abs(np.sum(train_score) / 5))
     rf_cv_errors.append(abs(np.sum(test_score) / 5))
 
-plt.plot(np.arange(5, 31), rf_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(5, 31), rf_cv_errors, color="red", label="Validation errors")
+plt.plot(np.arange(30, 31), rf_train_errors, color="green", label="Training errors")
+plt.plot(np.arange(30, 31), rf_cv_errors, color="red", label="Validation errors")
 plt.xlabel("Lambda values")
 plt.ylabel("MAE")
 plt.title("5-Fold errors by Lambda value (Random Forest)")
@@ -45,8 +45,8 @@ plt.legend()
 plt.show()
 
 
-print("Training error for trees = 30: " + str(rf_train_errors[25]))
-print("Validation error for trees = 30: " + str(rf_cv_errors[25]))
+print("Training error for trees = 30: " + str(rf_train_errors))
+print("Validation error for trees = 30: " + str(rf_cv_errors))
 
 model = RandomForestRegressor(n_estimators=12, random_state=0, max_features=25, n_jobs=-1, max_depth=31, min_samples_leaf=30)
 model.fit(train_x, train_y)
