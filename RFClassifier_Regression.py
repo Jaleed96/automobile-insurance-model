@@ -131,4 +131,4 @@ output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y_test))
 output['ClaimAmount'] = pred_y_test
 
-output.to_csv("./submissions/RFClassifier_Regression.csv", header=True, index=False)
+output.to_csv("./submissions/2_2_8.csv", header=True, index=False)

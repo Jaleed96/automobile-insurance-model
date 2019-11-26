@@ -59,4 +59,4 @@ output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y))
 output['claimAmount'] = pred_y
 
-output.to_csv("./submissions/1_2_7.csv", header=True, index=False)
+output.to_csv("./submissions/2_2_7.csv", header=True, index=False)

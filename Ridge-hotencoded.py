@@ -73,4 +73,4 @@ feature_importance_ind = np.argsort(absolute_weights)
 print('features least import to most important')
 # use sorted indexes to get hot encoded features
 print('top 5 features in increasing order', train_x.columns[feature_importance_ind[-5:]])
-output.to_csv("./submissions/1_2_6.csv", header=True, index=False)
+output.to_csv("./submissions/2_2_6.csv", header=True, index=False)
