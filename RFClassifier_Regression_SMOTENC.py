@@ -6,7 +6,7 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
-from imblearn.over_sampling import SMOTE
+from imblearn.over_sampling import SMOTENC
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
@@ -22,10 +22,12 @@ test_x = test_data.drop("rowIndex", axis=1, inplace=False)
 
 train_y_categorical = train_y.astype('bool')
 train_y_categorical = train_y_categorical.astype('int')
-
+print(train_x)
 # Adding synthetic samples
-sm = SMOTE(random_state=27, ratio=1.0)
+categorical_feats = [3, 4, 5, 7, 9, 11, 13, 14, 15, 16, 17, 18]
+sm = SMOTENC(categorical_features=categorical_feats, random_state=27)
 train_x_synthetic, train_y_categorical_synthetic = sm.fit_sample(train_x, train_y_categorical)
+print(len(train_x_synthetic), len(train_y_categorical_synthetic))
 
 train_x_synthetic = pd.DataFrame(data=train_x_synthetic[0:,0:], columns=test_x.columns)
 
