@@ -6,6 +6,7 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
+from imblearn.over_sampling import SMOTENC
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
@@ -17,47 +18,52 @@ train_y = training_data["ClaimAmount"]
 train_x = training_data.drop("rowIndex", axis=1, inplace=False)
 train_x.drop("ClaimAmount", axis=1, inplace=True)
 
-#categorical_features = ["feature3", "feature4", "feature5", "feature7", "feature9", "feature11", "feature13", "feature14", "feature15", "feature16", "feature17", "feature18"]
-#train_x = pd.get_dummies(train_no_index, columns=categorical_features,  prefix=categorical_features, drop_first=True)
+test_x = test_data.drop("rowIndex", axis=1, inplace=False)
+
+train_y_categorical = train_y.astype('bool')
+train_y_categorical = train_y_categorical.astype('int')
+print(train_x)
+# Adding synthetic samples
+categorical_feats = [3, 4, 5, 7, 9, 11, 13, 14, 15, 16, 17, 18]
+sm = SMOTENC(categorical_features=categorical_feats, random_state=27)
+train_x_synthetic, train_y_categorical_synthetic = sm.fit_sample(train_x, train_y_categorical)
+print(len(train_x_synthetic), len(train_y_categorical_synthetic))
+
+train_x_synthetic = pd.DataFrame(data=train_x_synthetic[0:,0:], columns=test_x.columns)
+
 train_x_claims_only = training_data[training_data.ClaimAmount != 0]
 train_x_claims_only.drop("rowIndex", axis=1, inplace=True)
 train_x_claims_only.drop("ClaimAmount", axis=1, inplace=True)
 
 train_y_claims_only = train_y[train_y != 0]
 
-test_x = test_data.drop("rowIndex", axis=1, inplace=False)
-#test_x = pd.get_dummies(test_x, columns=categorical_features,  prefix=categorical_features, drop_first=True)
-
-train_y_categorical = train_y.astype('bool')
-train_y_categorical = train_y_categorical.astype('int')
-
-
 rf_train_errors = []
 rf_cv_errors = []
 
 
-# for i in range(2, 8):
-#     model = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False, class_weight="balanced")
-#     result = cross_validate(model, train_x, train_y_categorical, cv=6, scoring='f1', return_train_score=True)
-#     train_score = result['train_score']
-#     test_score = result['test_score']
+for i in range(25, 30):
+    model = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False, class_weight="balanced")
+    result = cross_validate(model, train_x_synthetic, train_y_categorical_synthetic, cv=6, scoring='f1', return_train_score=True)
+    train_score = result['train_score']
+    test_score = result['test_score']
 
-#     rf_train_errors.append(abs(np.sum(train_score) / 6))
-#     rf_cv_errors.append(abs(np.sum(test_score) / 6))
+    rf_train_errors.append(abs(np.sum(train_score) / 6))
+    rf_cv_errors.append(abs(np.sum(test_score) / 6))
+    print(i)
 
-# print("Training error: " + str(rf_train_errors))
-# print("Validation error: " + str(rf_cv_errors))
+print("Training error: " + str(rf_train_errors))
+print("Validation error: " + str(rf_cv_errors))
 
-# plt.plot(np.arange(2, 8), rf_train_errors, color="green", label="Training errors")
-# plt.plot(np.arange(2, 8), rf_cv_errors, color="red", label="Validation errors")
-# plt.xlabel("Lambda values")
-# plt.ylabel("MAE")
-# plt.title("5-Fold errors by Lambda value (Random Forest)")
-# plt.legend()
-# plt.show()
+plt.plot(np.arange(25, 30), rf_train_errors, color="green", label="Training errors")
+plt.plot(np.arange(25, 30), rf_cv_errors, color="red", label="Validation errors")
+plt.xlabel("Lambda values")
+plt.ylabel("MAE")
+plt.title("5-Fold errors by Lambda value (Random Forest)")
+plt.legend()
+plt.show()
 
 classifier = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False, class_weight="balanced")
-classifier.fit(train_x, train_y_categorical)
+classifier.fit(train_x_synthetic, train_y_categorical_synthetic)
 
 pred_y_test = classifier.predict(test_x)
 pred_y_train = classifier.predict(train_x)
@@ -72,22 +78,25 @@ for i in range(len(pred_y_test)):
 for i in range(len(pred_y_train)):
     if pred_y_train[i] != 0:
         claiming_indices_train.append(i)
+        
+rf_train_errors = []
+rf_cv_errors = []
 
-for i in range(1, 40):
+for i in range(1, 5):
     model = RandomForestRegressor(n_estimators=30, random_state=0, max_features=3, n_jobs=-1, max_depth=19, min_samples_leaf=i)
     result = cross_validate(model, train_x_claims_only, train_y_claims_only, cv=6, scoring='neg_mean_absolute_error', return_train_score=True,  )
     train_score = result['train_score']
     test_score = result['test_score']
 
-    rf_train_errors.append(abs(np.sum(train_score) / 5))
-    rf_cv_errors.append(abs(np.sum(test_score) / 5))
+    rf_train_errors.append(abs(np.sum(train_score) / 6))
+    rf_cv_errors.append(abs(np.sum(test_score) / 6))
     print(i)
 
 print("Training error for trees = 30: " + str(rf_train_errors))
 print("Validation error for trees = 30: " + str(rf_cv_errors))
 
-plt.plot(np.arange(1, 40), rf_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(1, 40), rf_cv_errors, color="red", label="Validation errors")
+plt.plot(np.arange(1, 5), rf_train_errors, color="green", label="Training errors")
+plt.plot(np.arange(1, 5), rf_cv_errors, color="red", label="Validation errors")
 plt.xlabel("Lambda values")
 plt.ylabel("MAE")
 plt.title("5-Fold errors by Lambda value (Random Forest)")
@@ -114,4 +123,4 @@ output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y_test))
 output['ClaimAmount'] = pred_y_test
 
-output.to_csv("./submissions/2_2_8.csv", header=True, index=False)
+output.to_csv("./submissions/3_2_9.csv", header=True, index=False)

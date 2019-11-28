@@ -35,9 +35,10 @@ gb_train_errors = []
 gb_cv_errors = []
 
 
-for i in range(10, 30):
-    model = GradientBoostingClassifier(max_depth=i)
-    result = cross_validate(model, train_x, train_y_categorical, cv=6, scoring='precision', return_train_score=True)
+for i in range(500, 501):
+    print(i)
+    model = GradientBoostingClassifier(n_estimators=i)
+    result = cross_validate(model, train_x, train_y_categorical, cv=6, scoring='f1', return_train_score=True)
     train_score = result['train_score']
     test_score = result['test_score']
 
@@ -47,8 +48,8 @@ for i in range(10, 30):
 print("Training errors: " + str(gb_train_errors))
 print("Validation errors: " + str(gb_cv_errors))
 
-plt.plot(np.arange(10, 30), gb_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(10, 30), gb_cv_errors, color="red", label="Validation errors")
+plt.plot(np.arange(500, 501), gb_train_errors, color="green", label="Training errors")
+plt.plot(np.arange(500, 501), gb_cv_errors, color="red", label="Validation errors")
 plt.xlabel("Lambda values")
 plt.ylabel("MAE")
 plt.title("5-Fold errors by Lambda value (Random Forest)")
