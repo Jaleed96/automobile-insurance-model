@@ -6,11 +6,15 @@ from sklearn.linear_model import Ridge
 from sklearn.model_selection import cross_validate
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 from imblearn.over_sampling import SMOTENC
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
 training_data = pd.read_csv("./datasets/trainingset.csv")
+
+#training_data, test_data = train_test_split(data, train_size=0.75, test_size=0.25, shuffle=False, random_state=42)
 test_data = pd.read_csv("./datasets/testset.csv")
 
 # Splitting into x-y
@@ -22,12 +26,11 @@ test_x = test_data.drop("rowIndex", axis=1, inplace=False)
 
 train_y_categorical = train_y.astype('bool')
 train_y_categorical = train_y_categorical.astype('int')
-print(train_x)
+
 # Adding synthetic samples
-categorical_feats = [3, 4, 5, 7, 9, 11, 13, 14, 15, 16, 17, 18]
-sm = SMOTENC(categorical_features=categorical_feats, random_state=27)
+categorical_feats = [2, 3, 4, 6, 8, 10, 12, 13, 14, 15, 16, 17]
+sm = SMOTENC(categorical_features=categorical_feats, random_state=27, sampling_strategy=1.0)
 train_x_synthetic, train_y_categorical_synthetic = sm.fit_sample(train_x, train_y_categorical)
-print(len(train_x_synthetic), len(train_y_categorical_synthetic))
 
 train_x_synthetic = pd.DataFrame(data=train_x_synthetic[0:,0:], columns=test_x.columns)
 
@@ -37,30 +40,30 @@ train_x_claims_only.drop("ClaimAmount", axis=1, inplace=True)
 
 train_y_claims_only = train_y[train_y != 0]
 
-rf_train_errors = []
-rf_cv_errors = []
+# rf_train_errors = []
+# rf_cv_errors = []
 
 
-for i in range(25, 30):
-    model = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False, class_weight="balanced")
-    result = cross_validate(model, train_x_synthetic, train_y_categorical_synthetic, cv=6, scoring='f1', return_train_score=True)
-    train_score = result['train_score']
-    test_score = result['test_score']
+# for i in range(25, 30):
+#     model = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False)
+#     result = cross_validate(model, train_x_synthetic, train_y_categorical_synthetic, cv=6, scoring='f1', return_train_score=True)
+#     train_score = result['train_score']
+#     test_score = result['test_score']
 
-    rf_train_errors.append(abs(np.sum(train_score) / 6))
-    rf_cv_errors.append(abs(np.sum(test_score) / 6))
-    print(i)
+#     rf_train_errors.append(abs(np.sum(train_score) / 6))
+#     rf_cv_errors.append(abs(np.sum(test_score) / 6))
+#     print(i)
 
-print("Training error: " + str(rf_train_errors))
-print("Validation error: " + str(rf_cv_errors))
+# print("Training error: " + str(rf_train_errors))
+# print("Validation error: " + str(rf_cv_errors))
 
-plt.plot(np.arange(25, 30), rf_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(25, 30), rf_cv_errors, color="red", label="Validation errors")
-plt.xlabel("Lambda values")
-plt.ylabel("MAE")
-plt.title("5-Fold errors by Lambda value (Random Forest)")
-plt.legend()
-plt.show()
+# plt.plot(np.arange(25, 30), rf_train_errors, color="green", label="Training errors")
+# plt.plot(np.arange(25, 30), rf_cv_errors, color="red", label="Validation errors")
+# plt.xlabel("Lambda values")
+# plt.ylabel("MAE")
+# plt.title("5-Fold errors by Lambda value (Random Forest)")
+# plt.legend()
+# plt.show()
 
 classifier = RandomForestClassifier(n_estimators=20, random_state=0, n_jobs=-1, max_depth=28, bootstrap=False, class_weight="balanced")
 classifier.fit(train_x_synthetic, train_y_categorical_synthetic)
@@ -79,29 +82,29 @@ for i in range(len(pred_y_train)):
     if pred_y_train[i] != 0:
         claiming_indices_train.append(i)
         
-rf_train_errors = []
-rf_cv_errors = []
+# rf_train_errors = []
+# rf_cv_errors = []
 
-for i in range(1, 5):
-    model = RandomForestRegressor(n_estimators=30, random_state=0, max_features=3, n_jobs=-1, max_depth=19, min_samples_leaf=i)
-    result = cross_validate(model, train_x_claims_only, train_y_claims_only, cv=6, scoring='neg_mean_absolute_error', return_train_score=True,  )
-    train_score = result['train_score']
-    test_score = result['test_score']
+# for i in range(30, 35):
+#     model = RandomForestRegressor(n_estimators=30, random_state=0, max_features=3, n_jobs=-1, max_depth=19, min_samples_leaf=i)
+#     result = cross_validate(model, train_x_claims_only, train_y_claims_only, cv=6, scoring='neg_mean_absolute_error', return_train_score=True,  )
+#     train_score = result['train_score']
+#     test_score = result['test_score']
 
-    rf_train_errors.append(abs(np.sum(train_score) / 6))
-    rf_cv_errors.append(abs(np.sum(test_score) / 6))
-    print(i)
+#     rf_train_errors.append(abs(np.sum(train_score) / 6))
+#     rf_cv_errors.append(abs(np.sum(test_score) / 6))
+#     print(i)
 
-print("Training error for trees = 30: " + str(rf_train_errors))
-print("Validation error for trees = 30: " + str(rf_cv_errors))
+# print("Training error for trees = 30: " + str(rf_train_errors))
+# print("Validation error for trees = 30: " + str(rf_cv_errors))
 
-plt.plot(np.arange(1, 5), rf_train_errors, color="green", label="Training errors")
-plt.plot(np.arange(1, 5), rf_cv_errors, color="red", label="Validation errors")
-plt.xlabel("Lambda values")
-plt.ylabel("MAE")
-plt.title("5-Fold errors by Lambda value (Random Forest)")
-plt.legend()
-plt.show()
+# plt.plot(np.arange(30, 35), rf_train_errors, color="green", label="Training errors")
+# plt.plot(np.arange(30, 35), rf_cv_errors, color="red", label="Validation errors")
+# plt.xlabel("Lambda values")
+# plt.ylabel("MAE")
+# plt.title("5-Fold errors by Lambda value (Random Forest)")
+# plt.legend()
+# plt.show()
         
 regressor = RandomForestRegressor(n_estimators=30, random_state=0, max_features=3, n_jobs=-1, max_depth=19, min_samples_leaf=30)
 regressor.fit(train_x_claims_only, train_y_claims_only)
@@ -123,4 +126,4 @@ output = pd.DataFrame({})
 output['rowIndex'] = range(len(pred_y_test))
 output['ClaimAmount'] = pred_y_test
 
-output.to_csv("./submissions/3_2_9.csv", header=True, index=False)
+output.to_csv("./submissions/3_2_10.csv", header=True, index=False)
